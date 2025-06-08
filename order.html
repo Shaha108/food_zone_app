@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-blue-50 to-blue-200 p-6"
+    style="
+      cursor: url('https://cdn.jsdelivr.net/gh/uzair-ashraf/cursor-fun/cursors/cursor6.cur'),
+        auto;
+    "
+  >
+    <div
+      id="order-container"
+      class="bg-white rounded-2xl shadow-xl p-8 max-w-3xl w-full"
+    >
+      <h2 class="text-2xl font-semibold text-center text-gray-800">
+        🧾 Your Order
+      </h2>
+      <div
+        id="order-list"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8"
+      ></div>
+      <p class="text-center mt-4 text-gray-700">
+        Estimated Delivery: <strong>30–45 minutes</strong>
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 mt-6">
+        <a
+          href="index.html"
+          class="bg-blue-400 hover:bg-blue-300 text-white px-4 py-2 rounded-lg text-center"
+          >← Back to Menu</a
+        >
+        <button
+          class="bg-blue-400 hover:bg-blue-300 text-white px-4 py-2 rounded-lg"
+          onclick="clearCart()"
+        >
+          🗑️ Clear Order
+        </button>
+        <button
+          class="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg"
+          onclick="finishOrder()"
+        >
+          ✅ Finish Order
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const orderList = document.getElementById("order-list");
+      const orderContainer = document.getElementById("order-container");
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+      function clearCart() {
+        localStorage.removeItem("cart");
+        location.reload();
+      }
+
+      function finishOrder() {
+        if (cart.length === 0) return;
+
+        const total = cart.reduce((sum, item) => {
+          const price = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+          return sum + (isNaN(price) ? 0 : price);
+        }, 0);
+
+        orderContainer.innerHTML = `
+          <div class="text-center">
+            <h2 class="text-3xl font-bold text-green-600 mb-4">🎉 Successfully Ordered!</h2>
+            <p class="text-gray-700 text-lg mb-2">Your total is <strong>$${total.toFixed(
+              2
+            )}</strong>.</p>
+            <p class="text-gray-600 mb-6">Thank you for your order. It will be delivered shortly!</p>
+            <a
+              href="index.html"
+              class="inline-block bg-blue-400 hover:bg-blue-300 text-white px-4 py-2 rounded-lg"
+            >← Back to Menu</a>
+          </div>
+        `;
+
+        localStorage.removeItem("cart");
+      }
+
+      if (cart.length === 0) {
+        orderList.innerHTML =
+          '<p class="col-span-full text-center text-gray-600">Your cart is empty.</p>';
+      } else {
+        cart.forEach((item) => {
+          const div = document.createElement("div");
+          div.className =
+            "relative bg-gray-100 rounded-xl shadow-md p-4 text-center transition transform hover:scale-105 hover:bg-gray-200";
+          div.innerHTML = `
+            <div class="text-5xl mb-2">${item.emoji}</div>
+            <h4 class="font-semibold text-lg">${item.name}</h4>
+            <p class="text-gray-600">${item.price}</p>
+            <div class="absolute inset-0 bg-white bg-opacity-90 flex flex-col justify-center items-center opacity-0 hover:opacity-100 transition-opacity p-4 rounded-xl">
+              <h4 class="text-lg font-bold">${item.name}</h4>
+              <p class="text-gray-700 text-sm mt-2">${
+                item.ingredients || "Delicious item from our kitchen."
+              }</p>
+            </div>
+          `;
+          orderList.appendChild(div);
+        });
+      }
+    </script>
+  </body>
+</html>
